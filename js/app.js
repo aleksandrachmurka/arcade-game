@@ -4,43 +4,43 @@ let Enemy = function(x, y) {
     this.sprite = 'images/enemy-bug.png';
     this.x = x;
     this.y = y;
-    this.speed = Math.floor(Math.random() * 100);
+    this.speed = Math.floor(Math.random() * 100 + 50);
 };
 
-// Update the Enemy's position
-// Parameter: dt, a time delta between ticks (will ensure the game runs at the same speed for all computers.)
+// update the Enemy's position
+// parameter dt, a time delta between ticks (will ensure the game runs at the same speed for all computers)
 Enemy.prototype.update = function(dt) {
     this.x += this.speed * dt;
     if (this.x>510) {
     	this.x = -50;
     }
-    checkCollision();
+
+    this.checkCollision();
 }
 
-// Checks if Player collided with Enemy
+// check if Player collided with Enemy
 Enemy.prototype.checkCollision = function() {
 	if ((this.x > player.x - 75 && this.x < player.x + 75) && (this.y == player.y)) {
 		player.score -= 10;
-		resetPlayer();
+		player.resetPlayer();
 	}
 }
 
 
-// Draw the Enemy on the screen
+// draw the Enemy on the screen
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Player constructor function
 let Player = function(x, y) {
-	this.sprite = 'images/char-boy.png';
+	this.sprite = 'images/char-princess.png';
 	this.score = 0;
 	this.x = x;
 	this.y = y;
 }
 
-
-// Enables Player's moves
+// enable Players moves
 Player.prototype.movePlayer = function(pressedKey) {
 	if (pressedKey ==='left' &&  this.x > 2) {
 		this.x -= 100;
@@ -48,7 +48,7 @@ Player.prototype.movePlayer = function(pressedKey) {
 	else if (pressedKey === 'up' && this.y > 0) {
 		if (this.y <= 70) {
 			this.score += 10;
-			setTimeout(resetPlayer(), 2000);
+			setTimeout(player.resetPlayer(), 2000);
 		}
 
 		else {
@@ -63,26 +63,30 @@ Player.prototype.movePlayer = function(pressedKey) {
 	}
 }
 
-// when Player reaches water block, his position in restarted
+Player.prototype.update = function() {
+
+}
+
+// when Player reaches water block, his position in restarted and score is updated
 Player.prototype.resetPlayer = function() {
 	this.x = 202;
 	this.y = 405;
-	setGamePoints();
+	setGameScore();
 }
 
-// Draw the Player on the screen
+// draw the Player on the screen
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
-// Creating objects
+// instantine objects
 let player  = new Player(202, 405);
 let enemy1 = new Enemy(-50, 85);
 let enemy2 = new Enemy(-50, 165);
 let enemy3 = new Enemy(-50, 245);
 let allEnemies = [enemy1, enemy2, enemy3];
 
-// Eventlistener for key presses and sends the keys to Player.movePlayer() method
+// listen for key press events and send them to Player.movePlayer() method
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
         37: 'left',
@@ -94,8 +98,8 @@ document.addEventListener('keyup', function(e) {
     player.movePlayer(allowedKeys[e.keyCode]);
 });
 
-
-function setGamePoints() {
+// update element showing Players score
+function setGameScore() {
 	let score = document.getElementById("score");
    	return score.textContent = "Your score: " + player.score;
 }
